@@ -58,6 +58,41 @@
             transform: scale(1);
         }
 
+        .author {
+            font-size: 2rem;
+            font-weight: 300;
+            color: #9CA3AF;
+            margin-top: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1.2s ease-out;
+            letter-spacing: 3px;
+            font-style: italic;
+        }
+
+        .author.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .story-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #355E3B;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #355E3B;
+            text-align: left;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: all 0.8s ease-out;
+        }
+
+        .story-title.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
         .leaf {
             position: fixed;
             /* Cambiado de absolute a fixed para que las hojas permanezcan en pantalla */
@@ -123,15 +158,14 @@
     <div class="section" id="title-section">
         <div class="content">
             <h1 class="title">Cuentos de un mal escritor</h1>
-            <br>
-            <h2>By Leon Martin</h2>
+            <h2 class="author">By Leon Martin</h2>
         </div>
     </div>
 
     <div class="story-section" id="story-section">
         <div class="story-content">
             <div class="story-text">
-                <p class="story-paragraph">Olvidé los audífonos...</p>
+                <h3 class="story-title">Olvidé los audífonos...</h3>
                 <p class="story-paragraph">En algún lugar de mi casa, olvidé mis audífonos, ¿De qué sirve tener música si no puedes disfrutarla?, estuve vulnerable a las conversaciones de la gente del metro.</p>
                 <p class="story-paragraph">Hubo una que me llamó la atención. Una chica repitiéndole a un tipo que lo amaba. Ella lo miraba, él la miraba, ambos se miraban, se besaban y suspiraban.</p>
                 <p class="story-paragraph">Cuando llegamos a la estación Pantitlán, ella con mucha ternura se despidió de él. Lo llenó de besos, mientras repetía que lo adoraba con un tono infantil. Me conmoví, y no lo niego, por un instante quería estar en su lugar.</p>
@@ -201,20 +235,29 @@
         function handleScroll() {
             const scrolled = window.scrollY;
             const windowHeight = window.innerHeight;
-            // Título
+
+            // Título y autor
             const title = document.querySelector('.title');
+            const author = document.querySelector('.author');
             if (scrolled < windowHeight) {
                 title.classList.add('visible');
+                author.classList.add('visible');
                 const scale = 1 + (scrolled / windowHeight) * 0.5;
                 const opacity = 1 - (scrolled / windowHeight);
                 document.querySelector('.content').style.transform = `scale(${scale}) translateZ(${scrolled}px)`;
                 title.style.opacity = opacity;
+                author.style.opacity = opacity;
             }
-            // Historia
+
+            // Historia y título del cuento
             const storyContent = document.querySelector('.story-content');
+            const storyTitle = document.querySelector('.story-title');
             const storyRect = document.querySelector('.story-section').getBoundingClientRect();
+            
             if (storyRect.top < windowHeight * 0.8) {
                 storyContent.classList.add('visible');
+                storyTitle.classList.add('visible');
+                
                 // Revelar párrafos gradualmente
                 const paragraphs = document.querySelectorAll('.story-paragraph');
                 paragraphs.forEach((paragraph, index) => {
