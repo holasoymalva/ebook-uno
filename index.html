@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
         * {
@@ -16,14 +17,13 @@
             perspective: 1000px;
         }
 
-        /* Estilo personalizado para la selección de texto */
         ::selection {
-            background-color: #355E3B; /* Verde olivo */
+            background-color: #355E3B;
             color: white;
         }
-        
+
         ::-moz-selection {
-            background-color: #355E3B; /* Verde olivo */
+            background-color: #355E3B;
             color: white;
         }
 
@@ -59,13 +59,16 @@
         }
 
         .leaf {
-            position: absolute;
+            position: fixed;
+            /* Cambiado de absolute a fixed para que las hojas permanezcan en pantalla */
             width: 20px;
             height: 40px;
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 40"><path d="M10 0C15 10 20 20 10 40C0 20 5 10 10 0Z" fill="%23355E3B"/></svg>');
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.5s;
+            z-index: 2;
+            /* Aseguramos que las hojas estén por encima del contenido */
         }
 
         .story-section {
@@ -78,12 +81,15 @@
         }
 
         .story-content {
+            position: relative;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
             opacity: 0;
             transform: translateY(50px);
             transition: all 1s ease-out;
+            z-index: 1;
+            /* Aseguramos que el contenido esté por debajo de las hojas */
         }
 
         .story-content.visible {
@@ -112,14 +118,16 @@
         }
     </style>
 </head>
+
 <body>
     <div class="section" id="title-section">
         <div class="content">
             <h1 class="title">Cuentos de un mal escritor</h1>
+            <br>
             <h2>By Leon Martin</h2>
         </div>
     </div>
-    
+
     <div class="story-section" id="story-section">
         <div class="story-content">
             <div class="story-text">
@@ -139,14 +147,14 @@
         const leaves = [];
 
         function createLeaves() {
-            const titleSection = document.getElementById('title-section');
+            const body = document.body;
             for (let i = 0; i < leafCount; i++) {
                 const leaf = document.createElement('div');
                 leaf.className = 'leaf';
                 leaf.style.left = `${Math.random() * 100}vw`;
                 leaf.style.top = `${Math.random() * 100}vh`;
                 leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
-                titleSection.appendChild(leaf);
+                body.appendChild(leaf);
                 leaves.push({
                     element: leaf,
                     x: Math.random() * window.innerWidth,
@@ -160,27 +168,39 @@
         }
 
         function animateLeaves() {
+            const documentHeight = Math.max(
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight
+            );
             leaves.forEach(leaf => {
                 leaf.x += leaf.speedX;
                 leaf.y += leaf.speedY;
                 leaf.rotation += leaf.rotationSpeed;
-
-                if (leaf.y > window.innerHeight) {
-                    leaf.y = -50;
+                // Reiniciar la posición cuando la hoja sale de la vista
+                if (leaf.y > window.innerHeight + window.scrollY) {
+                    leaf.y = window.scrollY - 50;
                     leaf.x = Math.random() * window.innerWidth;
                 }
-
+                // Si la hoja sale por los lados, reubicarla
+                if (leaf.x < -50) leaf.x = window.innerWidth;
+                if (leaf.x > window.innerWidth + 50) leaf.x = -50;
                 leaf.element.style.transform = `translate(${leaf.x}px, ${leaf.y}px) rotate(${leaf.rotation}deg)`;
-                leaf.element.style.opacity = Math.min(1, Math.max(0, 1 - (window.scrollY / window.innerHeight)));
+                // Ajustar la opacidad basada en la posición en la página
+                const scrollProgress = window.scrollY / (documentHeight - window.innerHeight);
+                const fadeStart = 0.8; // Punto donde comienza el fade out
+                if (scrollProgress > fadeStart) {
+                    const fadeOutProgress = (scrollProgress - fadeStart) / (1 - fadeStart);
+                    leaf.element.style.opacity = Math.max(0, 1 - fadeOutProgress);
+                } else {
+                    leaf.element.style.opacity = 1;
+                }
             });
-
             requestAnimationFrame(animateLeaves);
         }
 
         function handleScroll() {
             const scrolled = window.scrollY;
             const windowHeight = window.innerHeight;
-
             // Título
             const title = document.querySelector('.title');
             if (scrolled < windowHeight) {
@@ -190,14 +210,11 @@
                 document.querySelector('.content').style.transform = `scale(${scale}) translateZ(${scrolled}px)`;
                 title.style.opacity = opacity;
             }
-
             // Historia
             const storyContent = document.querySelector('.story-content');
             const storyRect = document.querySelector('.story-section').getBoundingClientRect();
-            
             if (storyRect.top < windowHeight * 0.8) {
                 storyContent.classList.add('visible');
-                
                 // Revelar párrafos gradualmente
                 const paragraphs = document.querySelectorAll('.story-paragraph');
                 paragraphs.forEach((paragraph, index) => {
@@ -210,17 +227,14 @@
                 });
             }
         }
-
         window.addEventListener('load', () => {
             createLeaves();
             animateLeaves();
             handleScroll();
         });
-
         window.addEventListener('scroll', () => {
             requestAnimationFrame(handleScroll);
         });
-
         window.addEventListener('resize', () => {
             leaves.forEach(leaf => {
                 leaf.x = Math.random() * window.innerWidth;
@@ -229,4 +243,5 @@
         });
     </script>
 </body>
+
 </html>
