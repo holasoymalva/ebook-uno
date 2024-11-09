@@ -151,6 +151,52 @@
             opacity: 1;
             transform: translateY(0);
         }
+
+        .cursor-trail {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: rgba(53, 94, 59, 0.5);
+            /* Verde oliva con transparencia */
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            animation: trailFade 1s ease-out forwards;
+            box-shadow: 0 0 10px rgba(53, 94, 59, 0.8),
+                0 0 20px rgba(53, 94, 59, 0.6),
+                0 0 30px rgba(53, 94, 59, 0.4);
+        }
+
+        @keyframes trailFade {
+            from {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1);
+                background: rgba(53, 94, 59, 0.7);
+                box-shadow: 0 0 15px rgba(53, 94, 59, 0.8),
+                    0 0 25px rgba(53, 94, 59, 0.6),
+                    0 0 35px rgba(53, 94, 59, 0.4);
+            }
+
+            to {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.1);
+                background: rgba(53, 94, 59, 0.1);
+                box-shadow: 0 0 5px rgba(53, 94, 59, 0.2),
+                    0 0 10px rgba(53, 94, 59, 0.1),
+                    0 0 15px rgba(53, 94, 59, 0.05);
+            }
+        }
+
+        /* Para evitar que el rastro interfiera con el texto */
+        .title,
+        .author,
+        .story-text,
+        .story-title {
+            position: relative;
+            z-index: 1;
+        }
     </style>
 </head>
 
@@ -235,7 +281,6 @@
         function handleScroll() {
             const scrolled = window.scrollY;
             const windowHeight = window.innerHeight;
-
             // Título y autor
             const title = document.querySelector('.title');
             const author = document.querySelector('.author');
@@ -248,16 +293,13 @@
                 title.style.opacity = opacity;
                 author.style.opacity = opacity;
             }
-
             // Historia y título del cuento
             const storyContent = document.querySelector('.story-content');
             const storyTitle = document.querySelector('.story-title');
             const storyRect = document.querySelector('.story-section').getBoundingClientRect();
-            
             if (storyRect.top < windowHeight * 0.8) {
                 storyContent.classList.add('visible');
                 storyTitle.classList.add('visible');
-                
                 // Revelar párrafos gradualmente
                 const paragraphs = document.querySelectorAll('.story-paragraph');
                 paragraphs.forEach((paragraph, index) => {
@@ -284,6 +326,31 @@
                 leaf.y = Math.random() * window.innerHeight;
             });
         });
+        // Función para crear el efecto de rastro del cursor
+        function createTrailEffect(e) {
+            const trail = document.createElement('div');
+            trail.className = 'cursor-trail';
+            trail.style.left = e.clientX + 'px';
+            trail.style.top = e.clientY + window.scrollY + 'px';
+            document.body.appendChild(trail);
+            // Eliminar el elemento después de la animación
+            setTimeout(() => {
+                trail.remove();
+            }, 1000);
+        }
+        // Función para limitar la frecuencia de creación de efectos
+        function throttle(func, limit) {
+            let inThrottle;
+            return function(e) {
+                if (!inThrottle) {
+                    func(e);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+        // Agregar el evento del mouse con throttle
+        document.addEventListener('mousemove', throttle(createTrailEffect, 50));
     </script>
 </body>
 
