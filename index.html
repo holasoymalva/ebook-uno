@@ -16,10 +16,20 @@
             perspective: 1000px;
         }
 
+        /* Estilo personalizado para la selección de texto */
+        ::selection {
+            background-color: #355E3B; /* Verde olivo */
+            color: white;
+        }
+        
+        ::-moz-selection {
+            background-color: #355E3B; /* Verde olivo */
+            color: white;
+        }
+
         .section {
-            position: sticky;
-            top: 0;
-            height: 100vh;
+            position: relative;
+            min-height: 100vh;
             width: 100%;
             display: flex;
             align-items: center;
@@ -55,39 +65,50 @@
             background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 40"><path d="M10 0C15 10 20 20 10 40C0 20 5 10 10 0Z" fill="%23355E3B"/></svg>');
             pointer-events: none;
             opacity: 0;
+            transition: opacity 0.5s;
         }
 
-        .story-content {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        .story-section {
+            position: relative;
+            min-height: 100vh;
+            padding: 5vh 0;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .story-content {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
             opacity: 0;
-            transform: scale(1.5);
+            transform: translateY(50px);
             transition: all 1s ease-out;
         }
 
         .story-content.visible {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0);
         }
 
         .story-text {
-            max-width: 800px;
             font-size: 1.5rem;
             line-height: 1.6;
             padding: 2rem;
             background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
-            transform: translateZ(0);
         }
 
-        .spacer {
-            height: 100vh;
+        .story-paragraph {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+            margin-bottom: 1.5rem;
+        }
+
+        .story-paragraph.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -97,25 +118,25 @@
             <h1 class="title">Cuentos de un mal escritor</h1>
         </div>
     </div>
-    <div class="spacer"></div>
     
-    <div class="section" id="story-section">
+    <div class="story-section" id="story-section">
         <div class="story-content">
             <div class="story-text">
-                El primer cuento comienza aquí...
-                <br><br>
-                En una noche sin estrellas, donde el silencio era el único testigo de las historias no contadas...
+                <p class="story-paragraph">Olvidé los audífonos...</p>
+                <p class="story-paragraph">En algún lugar de mi casa, olvidé mis audífonos, ¿De qué sirve tener música si no puedes disfrutarla?, estuve vulnerable a las conversaciones de la gente del metro.</p>
+                <p class="story-paragraph">Hubo una que me llamó la atención. Una chica repitiéndole a un tipo que lo amaba. Ella lo miraba, él la miraba, ambos se miraban, se besaban y suspiraban.</p>
+                <p class="story-paragraph">Cuando llegamos a la estación Pantitlán, ella con mucha ternura se despidió de él. Lo llenó de besos, mientras repetía que lo adoraba con un tono infantil. Me conmoví, y no lo niego, por un instante quería estar en su lugar.</p>
+                <p class="story-paragraph">Al salir del vagón quede detrás de ella, bajamos las escaleras, ella llevaba una lapicera de Hello Kitty y una pequeña mochila en la que difícilmente entraba un estuche de maquillaje de color verde, aún lo recuerdo y yo, la miraba con atención, tenía unos bonitos tatuajes en sus brazos, flores y tallos que bailaban al ritmo de sus movimientos, no lo niego me hubiera gustado ser aquel chico al que tanto quería.</p>
+                <p class="story-paragraph">Continuamos caminando hasta llegar al trasbordo, ella aceleró el paso, abrazo a otro chico que la esperaba en los torniquetes, se miraron tiernamente, se besaron y suspiraron, seguí caminando y me lamente por aquellos batos.</p>
+                <p class="story-paragraph">Extrañaba mis audífonos, extrañaba no entrometerme en otras vidas.</p>
             </div>
         </div>
     </div>
-    <div class="spacer"></div>
 
     <script>
-        // Configuración de las hojas
         const leafCount = 30;
         const leaves = [];
 
-        // Crear hojas
         function createLeaves() {
             const titleSection = document.getElementById('title-section');
             for (let i = 0; i < leafCount; i++) {
@@ -137,7 +158,6 @@
             }
         }
 
-        // Animar hojas
         function animateLeaves() {
             leaves.forEach(leaf => {
                 leaf.x += leaf.speedX;
@@ -156,7 +176,6 @@
             requestAnimationFrame(animateLeaves);
         }
 
-        // Manejar el scroll
         function handleScroll() {
             const scrolled = window.scrollY;
             const windowHeight = window.innerHeight;
@@ -173,14 +192,24 @@
 
             // Historia
             const storyContent = document.querySelector('.story-content');
-            if (scrolled > windowHeight * 0.5) {
+            const storyRect = document.querySelector('.story-section').getBoundingClientRect();
+            
+            if (storyRect.top < windowHeight * 0.8) {
                 storyContent.classList.add('visible');
-            } else {
-                storyContent.classList.remove('visible');
+                
+                // Revelar párrafos gradualmente
+                const paragraphs = document.querySelectorAll('.story-paragraph');
+                paragraphs.forEach((paragraph, index) => {
+                    const rect = paragraph.getBoundingClientRect();
+                    if (rect.top < windowHeight * 0.9) {
+                        setTimeout(() => {
+                            paragraph.classList.add('visible');
+                        }, index * 200);
+                    }
+                });
             }
         }
 
-        // Inicialización
         window.addEventListener('load', () => {
             createLeaves();
             animateLeaves();
@@ -191,7 +220,6 @@
             requestAnimationFrame(handleScroll);
         });
 
-        // Responsive
         window.addEventListener('resize', () => {
             leaves.forEach(leaf => {
                 leaf.x = Math.random() * window.innerWidth;
