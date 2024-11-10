@@ -244,10 +244,76 @@
             transform-style: preserve-3d;
             transition: transform 0.5s ease-out;
         }
+
+        /* Add new styles for audio controls */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(53, 94, 59, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .audio-controls button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .audio-controls button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .audio-controls .volume-slider {
+            width: 80px;
+            height: 5px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2.5px;
+            outline: none;
+        }
+
+        .audio-controls .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .audio-controls .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        #bgMusic {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
+     <!-- Add audio element -->
+     <audio id="bgMusic" loop>
+        <source src="src/songs/childhood.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <div class="section" id="title-section">
         <div class="content">
             <h1 class="title">Cuentos de un mal escritor</h1>
@@ -529,6 +595,29 @@
             createLeaves();
             animateLeaves();
             handleScroll();
+        });
+
+
+
+         // Add minimal audio functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const audio = document.getElementById('bgMusic');
+            
+            // Set initial volume
+            audio.volume = 0.5;
+
+            // Handle autoplay with user interaction requirement
+            const startAudio = () => {
+                audio.play().catch(() => {
+                    // If autoplay was prevented, wait for user interaction
+                    document.addEventListener('click', () => {
+                        audio.play();
+                    }, { once: true });
+                });
+            };
+
+            // Start audio when document is ready
+            startAudio();
         });
     </script>
 </body>
