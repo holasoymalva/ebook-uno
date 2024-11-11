@@ -2,309 +2,7 @@
 <html>
 
 <head>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background: #000;
-            color: white;
-            overflow-x: hidden;
-            perspective: 1000px;
-        }
-
-        ::selection {
-            background-color: #355E3B;
-            color: white;
-        }
-
-        ::-moz-selection {
-            background-color: #355E3B;
-            color: white;
-        }
-
-        .section {
-            position: relative;
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .content {
-            position: relative;
-            text-align: center;
-            z-index: 1;
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease-out;
-        }
-
-        .title {
-            font-size: 5rem;
-            font-weight: 700;
-            opacity: 0;
-            transform: scale(0.5);
-            transition: all 1s ease-out;
-        }
-
-        .title.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .author {
-            font-size: 2rem;
-            font-weight: 300;
-            color: #9CA3AF;
-            margin-top: 1rem;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 1.2s ease-out;
-            letter-spacing: 3px;
-            font-style: italic;
-        }
-
-        .author.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .story-title {
-            font-size: 2.5rem;
-            font-weight: 600;
-            color: #355E3B;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #355E3B;
-            text-align: left;
-            opacity: 0;
-            transform: translateX(-20px);
-            transition: all 0.8s ease-out;
-        }
-
-        .story-title.visible {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .leaf {
-            position: fixed;
-            /* Cambiado de absolute a fixed para que las hojas permanezcan en pantalla */
-            width: 20px;
-            height: 40px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 40"><path d="M10 0C15 10 20 20 10 40C0 20 5 10 10 0Z" fill="%23355E3B"/></svg>');
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 2;
-            /* Aseguramos que las hojas estén por encima del contenido */
-        }
-
-        .story-section {
-            position: relative;
-            min-height: 100vh;
-            padding: 5vh 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .story-content {
-            position: relative;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 1s ease-out;
-            z-index: 1;
-            /* Aseguramos que el contenido esté por debajo de las hojas */
-        }
-
-        .story-content.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .story-text {
-            font-size: 1.5rem;
-            line-height: 1.6;
-            padding: 2rem;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-        }
-
-        .story-paragraph {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s ease-out;
-            margin-bottom: 1.5rem;
-        }
-
-        .story-paragraph.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .cursor-trail {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: rgba(53, 94, 59, 0.5);
-            /* Verde oliva con transparencia */
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            transform: translate(-50%, -50%);
-            mix-blend-mode: screen;
-            animation: trailFade 1s ease-out forwards;
-            box-shadow: 0 0 10px rgba(53, 94, 59, 0.8),
-                0 0 20px rgba(53, 94, 59, 0.6),
-                0 0 30px rgba(53, 94, 59, 0.4);
-        }
-
-        @keyframes trailFade {
-            from {
-                opacity: 0.8;
-                transform: translate(-50%, -50%) scale(1);
-                background: rgba(53, 94, 59, 0.7);
-                box-shadow: 0 0 15px rgba(53, 94, 59, 0.8),
-                    0 0 25px rgba(53, 94, 59, 0.6),
-                    0 0 35px rgba(53, 94, 59, 0.4);
-            }
-
-            to {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.1);
-                background: rgba(53, 94, 59, 0.1);
-                box-shadow: 0 0 5px rgba(53, 94, 59, 0.2),
-                    0 0 10px rgba(53, 94, 59, 0.1),
-                    0 0 15px rgba(53, 94, 59, 0.05);
-            }
-        }
-
-        /* Para evitar que el rastro interfiera con el texto */
-        .title,
-        .author,
-        .story-text,
-        .story-title {
-            position: relative;
-            z-index: 1;
-        }
-
-        .parallax-flower {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1;
-            transition: transform 0.1s ease-out;
-            opacity: 0.7;
-            mix-blend-mode: screen;
-            will-change: transform;
-        }
-
-        .parallax-flower img {
-            width: 180px;
-            height: 180px;
-            object-fit: contain;
-            transform-origin: center center;
-            transition: all 0.3s ease-out;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-        }
-
-        .parallax-flower.small img {
-            width: 120px;
-            height: 120px;
-        }
-
-        .parallax-flower.large img {
-            width: 250px;
-            height: 250px;
-        }
-
-        .section {
-            position: relative;
-            min-height: 100vh;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        .content {
-            position: relative;
-            text-align: center;
-            z-index: 2;
-            transform-style: preserve-3d;
-            transition: transform 0.5s ease-out;
-        }
-
-        /* Add new styles for audio controls */
-        .audio-controls {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(53, 94, 59, 0.8);
-            padding: 10px;
-            border-radius: 10px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        .audio-controls button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .audio-controls button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .audio-controls .volume-slider {
-            width: 80px;
-            height: 5px;
-            -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2.5px;
-            outline: none;
-        }
-
-        .audio-controls .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            background: white;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .audio-controls .volume-slider::-moz-range-thumb {
-            width: 12px;
-            height: 12px;
-            background: white;
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-        }
-        #bgMusic {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="src/styles/styles.css">
 </head>
 
 <body>
@@ -316,7 +14,7 @@
 
     <div class="section" id="title-section">
         <div class="content">
-            <h1 class="title">Cuentos de un mal escritor</h1>
+            <h1 class="title">Cuando las flores cantan</h1>
             <h2 class="author">By Leon Martin</h2>
         </div>
     </div>
@@ -331,294 +29,310 @@
                 <p class="story-paragraph">Al salir del vagón quede detrás de ella, bajamos las escaleras, ella llevaba una lapicera de Hello Kitty y una pequeña mochila en la que difícilmente entraba un estuche de maquillaje de color verde, aún lo recuerdo y yo, la miraba con atención, tenía unos bonitos tatuajes en sus brazos, flores y tallos que bailaban al ritmo de sus movimientos, no lo niego me hubiera gustado ser aquel chico al que tanto quería.</p>
                 <p class="story-paragraph">Continuamos caminando hasta llegar al trasbordo, ella aceleró el paso, abrazo a otro chico que la esperaba en los torniquetes, se miraron tiernamente, se besaron y suspiraron, seguí caminando y me lamente por aquellos batos.</p>
                 <p class="story-paragraph">Extrañaba mis audífonos, extrañaba no entrometerme en otras vidas.</p>
+
+                <h3 class="story-title">Donde los Gatos Bailan</h3>
+                <p class="story-paragraph">Había una vez un gato que no quería ser gato, de sus siete vidas solo le quedaba una, dormir y dormir, cada noche con menos ilusiones ¿Cazar? ¿Para qué cazar? ¿Maullar? ¿Para qué Maullar? ¿Qué lo hará diferente esta vez?</p>
+                <p class="story-paragraph">Desilusionado, un día callo un libro del ropero, libro rojo que jamás había visto en sus vidas y que al llegar a verlo, se vio a sí mismo, gato pardo de ojos amarillos, ojos estrella y piel de mariposa, patitas de seda y cabello de membrillo. Y de entre las letras se vio a él vuelto humana, bailando ballet, donde los gatos bailan.</p>
             </div>
         </div>
     </div>
 
     <script>
         const leafCount = 30;
-        const leaves = [];
+            const leaves = [];
 
-        function createLeaves() {
-            const body = document.body;
-            for (let i = 0; i < leafCount; i++) {
-                const leaf = document.createElement('div');
-                leaf.className = 'leaf';
-                leaf.style.left = `${Math.random() * 100}vw`;
-                leaf.style.top = `${Math.random() * 100}vh`;
-                leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
-                body.appendChild(leaf);
-                leaves.push({
-                    element: leaf,
-                    x: Math.random() * window.innerWidth,
-                    y: Math.random() * window.innerHeight,
-                    speedX: Math.random() * 2 - 1,
-                    speedY: Math.random() * 2 + 1,
-                    rotation: Math.random() * 360,
-                    rotationSpeed: (Math.random() - 0.5) * 2
-                });
+            function createLeaves() {
+                const body = document.body;
+                for (let i = 0; i < leafCount; i++) {
+                    const leaf = document.createElement('div');
+                    leaf.className = 'leaf';
+                    leaf.style.left = `${Math.random() * 100}vw`;
+                    leaf.style.top = `${Math.random() * 100}vh`;
+                    leaf.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    body.appendChild(leaf);
+                    leaves.push({
+                        element: leaf,
+                        x: Math.random() * window.innerWidth,
+                        y: Math.random() * window.innerHeight,
+                        speedX: Math.random() * 2 - 1,
+                        speedY: Math.random() * 2 + 1,
+                        rotation: Math.random() * 360,
+                        rotationSpeed: (Math.random() - 0.5) * 2
+                    });
+                }
             }
-        }
 
-        function animateLeaves() {
-            const documentHeight = Math.max(
-                document.body.scrollHeight,
-                document.documentElement.scrollHeight
-            );
-            leaves.forEach(leaf => {
-                leaf.x += leaf.speedX;
-                leaf.y += leaf.speedY;
-                leaf.rotation += leaf.rotationSpeed;
-                // Reiniciar la posición cuando la hoja sale de la vista
-                if (leaf.y > window.innerHeight + window.scrollY) {
-                    leaf.y = window.scrollY - 50;
+            function animateLeaves() {
+                const documentHeight = Math.max(
+                    document.body.scrollHeight,
+                    document.documentElement.scrollHeight
+                );
+                leaves.forEach(leaf => {
+                    leaf.x += leaf.speedX;
+                    leaf.y += leaf.speedY;
+                    leaf.rotation += leaf.rotationSpeed;
+                    // Reiniciar la posición cuando la hoja sale de la vista
+                    if (leaf.y > window.innerHeight + window.scrollY) {
+                        leaf.y = window.scrollY - 50;
+                        leaf.x = Math.random() * window.innerWidth;
+                    }
+                    // Si la hoja sale por los lados, reubicarla
+                    if (leaf.x < -50) leaf.x = window.innerWidth;
+                    if (leaf.x > window.innerWidth + 50) leaf.x = -50;
+                    leaf.element.style.transform = `translate(${leaf.x}px, ${leaf.y}px) rotate(${leaf.rotation}deg)`;
+                    // Ajustar la opacidad basada en la posición en la página
+                    const scrollProgress = window.scrollY / (documentHeight - window.innerHeight);
+                    const fadeStart = 0.8; // Punto donde comienza el fade out
+                    if (scrollProgress > fadeStart) {
+                        const fadeOutProgress = (scrollProgress - fadeStart) / (1 - fadeStart);
+                        leaf.element.style.opacity = Math.max(0, 1 - fadeOutProgress);
+                    } else {
+                        leaf.element.style.opacity = 1;
+                    }
+                });
+                requestAnimationFrame(animateLeaves);
+            }
+
+            function handleScroll() {
+                const scrolled = window.scrollY;
+                const windowHeight = window.innerHeight;
+
+                // Título y autor
+                const title = document.querySelector('.title');
+                const author = document.querySelector('.author');
+                if (scrolled < windowHeight) {
+                    title.classList.add('visible');
+                    author.classList.add('visible');
+                    const scale = 1 + (scrolled / windowHeight) * 0.5;
+                    const opacity = 1 - (scrolled / windowHeight);
+                    document.querySelector('.content').style.transform = `scale(${scale}) translateZ(${scrolled}px)`;
+                    title.style.opacity = opacity;
+                    author.style.opacity = opacity;
+                }
+
+                // Historia y títulos de cada cuento
+                const storyContent = document.querySelector('.story-content');
+                const storyTitles = document.querySelectorAll('.story-title');
+                const storyRect = document.querySelector('.story-section').getBoundingClientRect();
+
+                if (storyRect.top < windowHeight * 0.8) {
+                    storyContent.classList.add('visible');
+
+                    // Iterar sobre cada título y hacerlos visibles uno por uno
+                    storyTitles.forEach((storyTitle) => {
+                        const rect = storyTitle.getBoundingClientRect();
+                        if (rect.top < windowHeight * 0.8) {
+                            storyTitle.classList.add('visible');
+                        }
+                    });
+
+                    // Revelar párrafos gradualmente
+                    const paragraphs = document.querySelectorAll('.story-paragraph');
+                    paragraphs.forEach((paragraph, index) => {
+                        const rect = paragraph.getBoundingClientRect();
+                        if (rect.top < windowHeight * 0.9) {
+                            setTimeout(() => {
+                                paragraph.classList.add('visible');
+                            }, index * 200);
+                        }
+                    });
+                }
+            }
+
+            window.addEventListener('load', () => {
+                createLeaves();
+                animateLeaves();
+                handleScroll();
+            });
+            window.addEventListener('scroll', () => {
+                requestAnimationFrame(handleScroll);
+            });
+            window.addEventListener('resize', () => {
+                leaves.forEach(leaf => {
                     leaf.x = Math.random() * window.innerWidth;
-                }
-                // Si la hoja sale por los lados, reubicarla
-                if (leaf.x < -50) leaf.x = window.innerWidth;
-                if (leaf.x > window.innerWidth + 50) leaf.x = -50;
-                leaf.element.style.transform = `translate(${leaf.x}px, ${leaf.y}px) rotate(${leaf.rotation}deg)`;
-                // Ajustar la opacidad basada en la posición en la página
-                const scrollProgress = window.scrollY / (documentHeight - window.innerHeight);
-                const fadeStart = 0.8; // Punto donde comienza el fade out
-                if (scrollProgress > fadeStart) {
-                    const fadeOutProgress = (scrollProgress - fadeStart) / (1 - fadeStart);
-                    leaf.element.style.opacity = Math.max(0, 1 - fadeOutProgress);
-                } else {
-                    leaf.element.style.opacity = 1;
-                }
-            });
-            requestAnimationFrame(animateLeaves);
-        }
-
-        function handleScroll() {
-            const scrolled = window.scrollY;
-            const windowHeight = window.innerHeight;
-            // Título y autor
-            const title = document.querySelector('.title');
-            const author = document.querySelector('.author');
-            if (scrolled < windowHeight) {
-                title.classList.add('visible');
-                author.classList.add('visible');
-                const scale = 1 + (scrolled / windowHeight) * 0.5;
-                const opacity = 1 - (scrolled / windowHeight);
-                document.querySelector('.content').style.transform = `scale(${scale}) translateZ(${scrolled}px)`;
-                title.style.opacity = opacity;
-                author.style.opacity = opacity;
-            }
-            // Historia y título del cuento
-            const storyContent = document.querySelector('.story-content');
-            const storyTitle = document.querySelector('.story-title');
-            const storyRect = document.querySelector('.story-section').getBoundingClientRect();
-            if (storyRect.top < windowHeight * 0.8) {
-                storyContent.classList.add('visible');
-                storyTitle.classList.add('visible');
-                // Revelar párrafos gradualmente
-                const paragraphs = document.querySelectorAll('.story-paragraph');
-                paragraphs.forEach((paragraph, index) => {
-                    const rect = paragraph.getBoundingClientRect();
-                    if (rect.top < windowHeight * 0.9) {
-                        setTimeout(() => {
-                            paragraph.classList.add('visible');
-                        }, index * 200);
-                    }
+                    leaf.y = Math.random() * window.innerHeight;
                 });
-            }
-        }
-        window.addEventListener('load', () => {
-            createLeaves();
-            animateLeaves();
-            handleScroll();
-        });
-        window.addEventListener('scroll', () => {
-            requestAnimationFrame(handleScroll);
-        });
-        window.addEventListener('resize', () => {
-            leaves.forEach(leaf => {
-                leaf.x = Math.random() * window.innerWidth;
-                leaf.y = Math.random() * window.innerHeight;
             });
-        });
-        // Función para crear el efecto de rastro del cursor
-        function createTrailEffect(e) {
-            const trail = document.createElement('div');
-            trail.className = 'cursor-trail';
-            trail.style.left = e.clientX + 'px';
-            trail.style.top = e.clientY + window.scrollY + 'px';
-            document.body.appendChild(trail);
-            // Eliminar el elemento después de la animación
-            setTimeout(() => {
-                trail.remove();
-            }, 1000);
-        }
-        // Función para limitar la frecuencia de creación de efectos
-        function throttle(func, limit) {
-            let inThrottle;
-            return function(e) {
-                if (!inThrottle) {
-                    func(e);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
+            // Función para crear el efecto de rastro del cursor
+            function createTrailEffect(e) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = e.clientX + 'px';
+                trail.style.top = e.clientY + window.scrollY + 'px';
+                document.body.appendChild(trail);
+                // Eliminar el elemento después de la animación
+                setTimeout(() => {
+                    trail.remove();
+                }, 1000);
+            }
+            // Función para limitar la frecuencia de creación de efectos
+            function throttle(func, limit) {
+                let inThrottle;
+                return function (e) {
+                    if (!inThrottle) {
+                        func(e);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
                 }
             }
-        }
-        // Agregar el evento del mouse con throttle
-        document.addEventListener('mousemove', throttle(createTrailEffect, 50));
+            // Agregar el evento del mouse con throttle
+            document.addEventListener('mousemove', throttle(createTrailEffect, 50));
 
 
 
-        // Configuración de las flores
-        const FLOWER_CONFIG = {
-            count: 12, // Número total de flores a mostrar
-            sizes: ['small', 'normal', 'large'], // Clases de tamaños
-            baseDepth: 0.05, // Profundidad base para el efecto parallax
-        };
+            // Configuración de las flores
+            const FLOWER_CONFIG = {
+                count: 12, // Número total de flores a mostrar
+                sizes: ['small', 'normal', 'large'], // Clases de tamaños
+                baseDepth: 0.05, // Profundidad base para el efecto parallax
+            };
 
-        // Función para crear flores con parallax
-        function createParallaxFlowers() {
-            const flowers = [];
-            
-            for (let i = 1; i <= FLOWER_CONFIG.count; i++) {
-                const flower = document.createElement('div');
-                flower.className = 'parallax-flower';
-                
-                // Añadir clase de tamaño aleatoria
-                const sizeClass = FLOWER_CONFIG.sizes[Math.floor(Math.random() * FLOWER_CONFIG.sizes.length)];
-                flower.classList.add(sizeClass);
-                
-                const img = document.createElement('img');
-                // Usar la ruta correcta a las imágenes
-                const imageNumber = Math.floor(Math.random() * 4) + 1; // Asumiendo que tienes 4 imágenes
-                img.src = `src/pictures/flowers/${imageNumber}.png`;
-                img.alt = `Flower ${imageNumber}`;
-                
-                // Configurar la posición y rotación inicial
-                flower.appendChild(img);
-                flower.style.left = `${Math.random() * 100}vw`;
-                flower.style.top = `${Math.random() * 100}vh`;
-                
-                // Añadir una rotación inicial aleatoria
-                const initialRotation = Math.random() * 360;
-                flower.style.transform = `rotate(${initialRotation}deg) scale(${0.8 + Math.random() * 0.4})`;
-                
-                document.body.appendChild(flower);
-                
-                // Almacenar propiedades de movimiento
-                flowers.push({
-                    element: flower,
-                    depth: FLOWER_CONFIG.baseDepth * (1 + Math.random()),
-                    rotationSpeed: (Math.random() - 0.5) * 0.1,
-                    initialX: parseFloat(flower.style.left),
-                    initialY: parseFloat(flower.style.top),
-                    amplitude: {
-                        x: Math.random() * 30 + 20,
-                        y: Math.random() * 30 + 20
-                    }
-                });
+            // Función para crear flores con parallax
+            function createParallaxFlowers() {
+                const flowers = [];
+
+                for (let i = 1; i <= FLOWER_CONFIG.count; i++) {
+                    const flower = document.createElement('div');
+                    flower.className = 'parallax-flower';
+
+                    // Añadir clase de tamaño aleatoria
+                    const sizeClass = FLOWER_CONFIG.sizes[Math.floor(Math.random() * FLOWER_CONFIG.sizes.length)];
+                    flower.classList.add(sizeClass);
+
+                    const img = document.createElement('img');
+                    // Usar la ruta correcta a las imágenes
+                    const imageNumber = Math.floor(Math.random() * 4) + 1; // Asumiendo que tienes 4 imágenes
+                    img.src = `src/pictures/flowers/${imageNumber}.png`;
+                    img.alt = `Flower ${imageNumber}`;
+
+                    // Configurar la posición y rotación inicial
+                    flower.appendChild(img);
+                    flower.style.left = `${Math.random() * 100}vw`;
+                    flower.style.top = `${Math.random() * 100}vh`;
+
+                    // Añadir una rotación inicial aleatoria
+                    const initialRotation = Math.random() * 360;
+                    flower.style.transform = `rotate(${initialRotation}deg) scale(${0.8 + Math.random() * 0.4})`;
+
+                    document.body.appendChild(flower);
+
+                    // Almacenar propiedades de movimiento
+                    flowers.push({
+                        element: flower,
+                        depth: FLOWER_CONFIG.baseDepth * (1 + Math.random()),
+                        rotationSpeed: (Math.random() - 0.5) * 0.1,
+                        initialX: parseFloat(flower.style.left),
+                        initialY: parseFloat(flower.style.top),
+                        amplitude: {
+                            x: Math.random() * 30 + 20,
+                            y: Math.random() * 30 + 20
+                        }
+                    });
+                }
+
+                return flowers;
             }
 
-            return flowers;
-        }
+            // Función para actualizar la posición de las flores con parallax
+            function updateParallaxFlowers(flowers, mouseX, mouseY) {
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
 
-        // Función para actualizar la posición de las flores con parallax
-        function updateParallaxFlowers(flowers, mouseX, mouseY) {
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            
-            flowers.forEach(flower => {
-                const rect = flower.element.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                // Calcular el movimiento basado en la posición del mouse
-                const deltaX = (mouseX - windowWidth / 2) * flower.depth;
-                const deltaY = (mouseY - windowHeight / 2) * flower.depth;
-                
-                // Aplicar transformación con parallax y rotación suave
-                flower.element.style.transform = `
+                flowers.forEach(flower => {
+                    const rect = flower.element.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+
+                    // Calcular el movimiento basado en la posición del mouse
+                    const deltaX = (mouseX - windowWidth / 2) * flower.depth;
+                    const deltaY = (mouseY - windowHeight / 2) * flower.depth;
+
+                    // Aplicar transformación con parallax y rotación suave
+                    flower.element.style.transform = `
                     translate(
                         ${deltaX}px,
                         ${deltaY}px
                     )
                     rotate(${deltaY * flower.rotationSpeed}deg)
                 `;
-            });
-        }
-
-        // Función para manejar el scroll y actualizar la opacidad
-        function handleFlowerScroll(flowers) {
-            const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            const fadeStart = 0.8;
-            
-            flowers.forEach(flower => {
-                if (scrollProgress > fadeStart) {
-                    const fadeOutProgress = (scrollProgress - fadeStart) / (1 - fadeStart);
-                    flower.element.style.opacity = Math.max(0, 0.7 - fadeOutProgress);
-                } else {
-                    flower.element.style.opacity = 0.7;
-                }
-            });
-        }
-
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            const flowers = createParallaxFlowers();
-            let rafId = null;
-            
-            // Evento de movimiento del mouse para parallax
-            document.addEventListener('mousemove', (e) => {
-                if (rafId) {
-                    cancelAnimationFrame(rafId);
-                }
-                
-                rafId = requestAnimationFrame(() => {
-                    updateParallaxFlowers(flowers, e.clientX, e.clientY);
                 });
-            });
+            }
 
-            // Manejar scroll
-            window.addEventListener('scroll', () => {
-                requestAnimationFrame(() => {
-                    handleFlowerScroll(flowers);
-                });
-            });
+            // Función para manejar el scroll y actualizar la opacidad
+            function handleFlowerScroll(flowers) {
+                const scrollProgress = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+                const fadeStart = 0.8;
 
-            // Manejar redimensionamiento de ventana
-            window.addEventListener('resize', () => {
                 flowers.forEach(flower => {
-                    flower.element.style.left = `${Math.random() * 100}vw`;
-                    flower.element.style.top = `${Math.random() * 100}vh`;
+                    if (scrollProgress > fadeStart) {
+                        const fadeOutProgress = (scrollProgress - fadeStart) / (1 - fadeStart);
+                        flower.element.style.opacity = Math.max(0, 0.7 - fadeOutProgress);
+                    } else {
+                        flower.element.style.opacity = 0.7;
+                    }
                 });
+            }
+
+            // Inicialización
+            document.addEventListener('DOMContentLoaded', () => {
+                const flowers = createParallaxFlowers();
+                let rafId = null;
+
+                // Evento de movimiento del mouse para parallax
+                document.addEventListener('mousemove', (e) => {
+                    if (rafId) {
+                        cancelAnimationFrame(rafId);
+                    }
+
+                    rafId = requestAnimationFrame(() => {
+                        updateParallaxFlowers(flowers, e.clientX, e.clientY);
+                    });
+                });
+
+                // Manejar scroll
+                window.addEventListener('scroll', () => {
+                    requestAnimationFrame(() => {
+                        handleFlowerScroll(flowers);
+                    });
+                });
+
+                // Manejar redimensionamiento de ventana
+                window.addEventListener('resize', () => {
+                    flowers.forEach(flower => {
+                        flower.element.style.left = `${Math.random() * 100}vw`;
+                        flower.element.style.top = `${Math.random() * 100}vh`;
+                    });
+                });
+
+                // Resto del código existente...
+                createLeaves();
+                animateLeaves();
+                handleScroll();
             });
 
-            // Resto del código existente...
-            createLeaves();
-            animateLeaves();
-            handleScroll();
-        });
 
 
+            // Add minimal audio functionality
+            document.addEventListener('DOMContentLoaded', () => {
+                const audio = document.getElementById('bgMusic');
 
-         // Add minimal audio functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            const audio = document.getElementById('bgMusic');
-            
-            // Set initial volume
-            audio.volume = 0.5;
+                // Set initial volume
+                audio.volume = 0.5;
 
-            // Handle autoplay with user interaction requirement
-            const startAudio = () => {
-                audio.play().catch(() => {
-                    // If autoplay was prevented, wait for user interaction
-                    document.addEventListener('click', () => {
-                        audio.play();
-                    }, { once: true });
-                });
-            };
+                // Handle autoplay with user interaction requirement
+                const startAudio = () => {
+                    audio.play().catch(() => {
+                        // If autoplay was prevented, wait for user interaction
+                        document.addEventListener('click', () => {
+                            audio.play();
+                        }, { once: true });
+                    });
+                };
 
-            // Start audio when document is ready
-            startAudio();
-        });
+                // Start audio when document is ready
+                startAudio();
+            });
     </script>
 </body>
 

@@ -1,0 +1,301 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #000;
+    color: white;
+    overflow-x: hidden;
+    perspective: 1000px;
+}
+
+::selection {
+    background-color: #355E3B;
+    color: white;
+}
+
+::-moz-selection {
+    background-color: #355E3B;
+    color: white;
+}
+
+.section {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.content {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease-out;
+}
+
+.title {
+    font-size: 5rem;
+    font-weight: 700;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 1s ease-out;
+}
+
+.title.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.author {
+    font-size: 2rem;
+    font-weight: 300;
+    color: #9CA3AF;
+    margin-top: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 1.2s ease-out;
+    letter-spacing: 3px;
+    font-style: italic;
+}
+
+.author.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.story-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #355E3B;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #355E3B;
+    text-align: left;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.8s ease-out;
+}
+
+.story-title.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.leaf {
+    position: fixed;
+    /* Cambiado de absolute a fixed para que las hojas permanezcan en pantalla */
+    width: 20px;
+    height: 40px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 40"><path d="M10 0C15 10 20 20 10 40C0 20 5 10 10 0Z" fill="%23355E3B"/></svg>');
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: 2;
+    /* Aseguramos que las hojas estén por encima del contenido */
+}
+
+.story-section {
+    position: relative;
+    min-height: 100vh;
+    padding: 5vh 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-content {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 1s ease-out;
+    z-index: 1;
+    /* Aseguramos que el contenido esté por debajo de las hojas */
+}
+
+.story-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.story-text {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+}
+
+.story-paragraph {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s ease-out;
+    margin-bottom: 1.5rem;
+}
+
+.story-paragraph.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cursor-trail {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: rgba(53, 94, 59, 0.5);
+    /* Verde oliva con transparencia */
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+    animation: trailFade 1s ease-out forwards;
+    box-shadow: 0 0 10px rgba(53, 94, 59, 0.8),
+        0 0 20px rgba(53, 94, 59, 0.6),
+        0 0 30px rgba(53, 94, 59, 0.4);
+}
+
+@keyframes trailFade {
+    from {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1);
+        background: rgba(53, 94, 59, 0.7);
+        box-shadow: 0 0 15px rgba(53, 94, 59, 0.8),
+            0 0 25px rgba(53, 94, 59, 0.6),
+            0 0 35px rgba(53, 94, 59, 0.4);
+    }
+
+    to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.1);
+        background: rgba(53, 94, 59, 0.1);
+        box-shadow: 0 0 5px rgba(53, 94, 59, 0.2),
+            0 0 10px rgba(53, 94, 59, 0.1),
+            0 0 15px rgba(53, 94, 59, 0.05);
+    }
+}
+
+/* Para evitar que el rastro interfiera con el texto */
+.title,
+.author,
+.story-text,
+.story-title {
+    position: relative;
+    z-index: 1;
+}
+
+.parallax-flower {
+    position: fixed;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.1s ease-out;
+    opacity: 0.7;
+    mix-blend-mode: screen;
+    will-change: transform;
+}
+
+.parallax-flower img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    transform-origin: center center;
+    transition: all 0.3s ease-out;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
+.parallax-flower.small img {
+    width: 120px;
+    height: 120px;
+}
+
+.parallax-flower.large img {
+    width: 250px;
+    height: 250px;
+}
+
+.section {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.content {
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease-out;
+}
+
+/* Add new styles for audio controls */
+.audio-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(53, 94, 59, 0.8);
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.audio-controls button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.audio-controls button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.audio-controls .volume-slider {
+    width: 80px;
+    height: 5px;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2.5px;
+    outline: none;
+}
+
+.audio-controls .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.audio-controls .volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+#bgMusic {
+    display: none;
+}
